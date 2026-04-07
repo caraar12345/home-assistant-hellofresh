@@ -9,7 +9,6 @@ import aiohttp
 import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from pyhellofresh import AuthenticationError, HelloFreshClient, HelloFreshError
 
 from .const import CONF_CUSTOMER_UUID, CONF_EMAIL, CONF_SUBSCRIPTION_ID, DOMAIN
@@ -37,12 +36,10 @@ class HelloFreshConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             email = user_input[CONF_EMAIL]
             password = user_input[CONF_PASSWORD]
-            session = async_get_clientsession(self.hass)
-
             try:
-                client = HelloFreshClient(email, password, session=session)
-                token = await client.authenticate()
-                info = await client.get_customer_info()
+                async with HelloFreshClient(email, password) as client:
+                    token = await client.authenticate()
+                    info = await client.get_customer_info()
             except AuthenticationError:
                 errors["base"] = "invalid_auth"
             except (HelloFreshError, aiohttp.ClientError):
@@ -85,12 +82,10 @@ class HelloFreshConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             email = user_input[CONF_EMAIL]
             password = user_input[CONF_PASSWORD]
-            session = async_get_clientsession(self.hass)
-
             try:
-                client = HelloFreshClient(email, password, session=session)
-                token = await client.authenticate()
-                info = await client.get_customer_info()
+                async with HelloFreshClient(email, password) as client:
+                    token = await client.authenticate()
+                    info = await client.get_customer_info()
             except AuthenticationError:
                 errors["base"] = "invalid_auth"
             except (HelloFreshError, aiohttp.ClientError):

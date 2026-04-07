@@ -10,7 +10,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from pyhellofresh import AuthenticationError, HelloFreshClient, HelloFreshError
 from pyhellofresh.models import WeeklyDelivery
@@ -33,13 +32,15 @@ class HelloFreshCoordinator(DataUpdateCoordinator[WeeklyDelivery]):
             update_interval=timedelta(hours=UPDATE_INTERVAL_HOURS),
         )
         self.config_entry = entry
-        session = async_get_clientsession(hass)
         self._client = HelloFreshClient(
             email=entry.data[CONF_EMAIL],
             password=entry.data[CONF_PASSWORD],
-            session=session,
         )
         self._subscription_id: int = entry.data[CONF_SUBSCRIPTION_ID]
+
+    async def async_shutdown(self) -> None:
+        """Close the underlying HTTP session."""
+        await self._client.close()
 
     async def _async_update_data(self) -> WeeklyDelivery:
         try:
