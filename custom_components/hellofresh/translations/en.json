@@ -1,0 +1,42 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "HelloFresh (UK)",
+        "description": "Enter your HelloFresh account credentials.",
+        "data": {
+          "email": "Email address",
+          "password": "Password",
+          "flaresolverr_url": "FlareSolverr URL (optional)"
+        },
+        "data_description": {
+          "flaresolverr_url": "URL of a FlareSolverr instance to bypass Cloudflare protection (e.g. http://localhost:8191)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate HelloFresh",
+        "data": {
+          "email": "Email address",
+          "password": "Password",
+          "flaresolverr_url": "FlareSolverr URL (optional)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid email address or password.",
+      "cannot_connect": "Unable to connect to HelloFresh. Please check your network connection.",
+      "cloudflare_blocked": "Cloudflare blocked the request. Provide a FlareSolverr URL to bypass this.",
+      "unknown": "Unexpected error. Please try again."
+    },
+    "abort": {
+      "already_configured": "This HelloFresh account is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "current_week_meals": {
+        "name": "This Week's Meals"
+      }
+    }
+  }
+}

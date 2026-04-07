@@ -5,6 +5,7 @@ from __future__ import annotations
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -38,6 +39,12 @@ class HelloFreshCurrentWeekSensor(
         super().__init__(coordinator)
         customer_uuid = entry.data[CONF_CUSTOMER_UUID]
         self._attr_unique_id = f"hellofresh_{customer_uuid}_current_week_meals"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, customer_uuid)},
+            name="HelloFresh",
+            manufacturer="HelloFresh",
+            entry_type=DeviceEntryType.SERVICE,
+        )
 
     @property
     def native_value(self) -> int:
