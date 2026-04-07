@@ -6,13 +6,18 @@
         "description": "Enter your HelloFresh account credentials.",
         "data": {
           "email": "Email address",
-          "password": "Password"
+          "password": "Password",
+          "flaresolverr_url": "FlareSolverr URL (optional)"
+        },
+        "data_description": {
+          "flaresolverr_url": "URL of a FlareSolverr instance to bypass Cloudflare protection (e.g. http://localhost:8191)"
         }
       }
     },
     "error": {
       "invalid_auth": "Invalid email address or password.",
       "cannot_connect": "Unable to connect to HelloFresh. Please check your network connection.",
+      "cloudflare_blocked": "Cloudflare blocked the request. Provide a FlareSolverr URL to bypass this.",
       "unknown": "Unexpected error. Please try again."
     },
     "abort": {

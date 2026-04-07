@@ -14,7 +14,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from pyhellofresh import AuthenticationError, HelloFreshClient, HelloFreshError
 from pyhellofresh.models import WeeklyDelivery
 
-from .const import CONF_EMAIL, CONF_SUBSCRIPTION_ID, DOMAIN, UPDATE_INTERVAL_HOURS
+from .const import CONF_EMAIL, CONF_FLARESOLVERR_URL, CONF_SUBSCRIPTION_ID, DOMAIN, UPDATE_INTERVAL_HOURS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +35,7 @@ class HelloFreshCoordinator(DataUpdateCoordinator[WeeklyDelivery]):
         self._client = HelloFreshClient(
             email=entry.data[CONF_EMAIL],
             password=entry.data[CONF_PASSWORD],
+            flaresolverr_url=entry.data.get(CONF_FLARESOLVERR_URL),
         )
         self._subscription_id: int = entry.data[CONF_SUBSCRIPTION_ID]
 

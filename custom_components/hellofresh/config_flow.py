@@ -9,9 +9,20 @@ import aiohttp
 import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD
-from pyhellofresh import AuthenticationError, HelloFreshClient, HelloFreshError
+from pyhellofresh import (
+    AuthenticationError,
+    CloudflareBlockError,
+    HelloFreshClient,
+    HelloFreshError,
+)
 
-from .const import CONF_CUSTOMER_UUID, CONF_EMAIL, CONF_SUBSCRIPTION_ID, DOMAIN
+from .const import (
+    CONF_CUSTOMER_UUID,
+    CONF_EMAIL,
+    CONF_FLARESOLVERR_URL,
+    CONF_SUBSCRIPTION_ID,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,6 +30,7 @@ STEP_USER_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_EMAIL): str,
         vol.Required(CONF_PASSWORD): str,
+        vol.Optional(CONF_FLARESOLVERR_URL): str,
     }
 )
 
@@ -36,12 +48,18 @@ class HelloFreshConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             email = user_input[CONF_EMAIL]
             password = user_input[CONF_PASSWORD]
+            flaresolverr_url = user_input.get(CONF_FLARESOLVERR_URL) or None
+
             try:
-                async with HelloFreshClient(email, password) as client:
+                async with HelloFreshClient(
+                    email, password, flaresolverr_url=flaresolverr_url
+                ) as client:
                     token = await client.authenticate()
                     info = await client.get_customer_info()
             except AuthenticationError:
                 errors["base"] = "invalid_auth"
+            except CloudflareBlockError:
+                errors["base"] = "cloudflare_blocked"
             except (HelloFreshError, aiohttp.ClientError):
                 _LOGGER.exception("Error connecting to HelloFresh")
                 errors["base"] = "cannot_connect"
@@ -57,6 +75,7 @@ class HelloFreshConfigFlow(ConfigFlow, domain=DOMAIN):
                     data={
                         CONF_EMAIL: email,
                         CONF_PASSWORD: password,
+                        CONF_FLARESOLVERR_URL: flaresolverr_url,
                         CONF_SUBSCRIPTION_ID: info.active_subscription_id,
                         CONF_CUSTOMER_UUID: info.uuid,
                         "refresh_token": token.refresh_token,
@@ -82,12 +101,18 @@ class HelloFreshConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             email = user_input[CONF_EMAIL]
             password = user_input[CONF_PASSWORD]
+            flaresolverr_url = user_input.get(CONF_FLARESOLVERR_URL) or None
+
             try:
-                async with HelloFreshClient(email, password) as client:
+                async with HelloFreshClient(
+                    email, password, flaresolverr_url=flaresolverr_url
+                ) as client:
                     token = await client.authenticate()
                     info = await client.get_customer_info()
             except AuthenticationError:
                 errors["base"] = "invalid_auth"
+            except CloudflareBlockError:
+                errors["base"] = "cloudflare_blocked"
             except (HelloFreshError, aiohttp.ClientError):
                 errors["base"] = "cannot_connect"
             except Exception:
@@ -101,6 +126,7 @@ class HelloFreshConfigFlow(ConfigFlow, domain=DOMAIN):
                     data_updates={
                         CONF_EMAIL: email,
                         CONF_PASSWORD: password,
+                        CONF_FLARESOLVERR_URL: flaresolverr_url,
                         "refresh_token": token.refresh_token,
                     },
                 )
