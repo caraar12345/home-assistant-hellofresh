@@ -17,6 +17,7 @@ from pyhellofresh import (
 )
 
 from .const import (
+    CONF_CUSTOMER_PLAN_ID,
     CONF_CUSTOMER_UUID,
     CONF_EMAIL,
     CONF_FLARESOLVERR_URL,
@@ -77,6 +78,7 @@ class HelloFreshConfigFlow(ConfigFlow, domain=DOMAIN):
                         CONF_PASSWORD: password,
                         CONF_FLARESOLVERR_URL: flaresolverr_url,
                         CONF_SUBSCRIPTION_ID: info.active_subscription_id,
+                        CONF_CUSTOMER_PLAN_ID: info.customer_plan_ids[0] if info.customer_plan_ids else "",
                         CONF_CUSTOMER_UUID: info.uuid,
                         "refresh_token": token.refresh_token,
                     },

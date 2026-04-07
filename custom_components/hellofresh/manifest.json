@@ -7,5 +7,5 @@
   "documentation": "https://github.com/caraar12345/home-assistant-hellofresh",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "requirements": ["pyhellofresh-uk==0.1.4"]
+  "requirements": ["pyhellofresh-uk==0.1.5"]
 }

@@ -29,6 +29,9 @@
     "sensor": {
       "current_week_meals": {
         "name": "This Week's Meals"
+      },
+      "next_delivery": {
+        "name": "Next Delivery"
       }
     }
   }
