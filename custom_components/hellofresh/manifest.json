@@ -1,0 +1,11 @@
+{
+  "domain": "hellofresh",
+  "name": "HelloFresh (UK)",
+  "version": "0.1.0",
+  "codeowners": ["@caraar12345"],
+  "config_flow": true,
+  "documentation": "https://github.com/caraar12345/home-assistant-hellofresh",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "requirements": ["pyhellofresh-uk==0.1.0"]
+}

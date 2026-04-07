@@ -1,0 +1,30 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "HelloFresh (UK)",
+        "description": "Enter your HelloFresh account credentials.",
+        "data": {
+          "email": "Email address",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid email address or password.",
+      "cannot_connect": "Unable to connect to HelloFresh. Please check your network connection.",
+      "unknown": "Unexpected error. Please try again."
+    },
+    "abort": {
+      "already_configured": "This HelloFresh account is already configured."
+    }
+  },
+  "options": {},
+  "entity": {
+    "sensor": {
+      "current_week_meals": {
+        "name": "This Week's Meals"
+      }
+    }
+  }
+}
