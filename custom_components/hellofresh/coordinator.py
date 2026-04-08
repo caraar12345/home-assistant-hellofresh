@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 
 import aiohttp
 from homeassistant.config_entries import ConfigEntry
@@ -31,8 +31,9 @@ _LOGGER = logging.getLogger(__name__)
 class HelloFreshData:
     """Combined data fetched from HelloFresh."""
 
-    current_week: WeeklyDelivery
+    last_delivery: WeeklyDelivery | None
     next_delivery: UpcomingDelivery | None
+    next_changeable: UpcomingDelivery | None
 
 
 class HelloFreshCoordinator(DataUpdateCoordinator[HelloFreshData]):
@@ -62,10 +63,26 @@ class HelloFreshCoordinator(DataUpdateCoordinator[HelloFreshData]):
 
     async def _async_update_data(self) -> HelloFreshData:
         try:
-            current_week = await self._client.get_current_week_meals(self._subscription_id)
+            last_delivery = await self._client.get_last_delivery(self._subscription_id)
             next_delivery = await self._client.get_upcoming_delivery(
                 self._subscription_id, self._customer_plan_id
             )
+
+            # Avoid a duplicate menu fetch: if next_delivery hasn't passed its
+            # cutoff yet, it is itself the next changeable delivery.
+            if next_delivery is not None:
+                cutoff = next_delivery.cutoff_date
+                if cutoff.tzinfo is None:
+                    cutoff = cutoff.replace(tzinfo=UTC)
+                if datetime.now(tz=UTC) < cutoff:
+                    next_changeable = next_delivery
+                else:
+                    next_changeable = await self._client.get_next_changeable_delivery(
+                        self._subscription_id, self._customer_plan_id
+                    )
+            else:
+                next_changeable = None
+
         except AuthenticationError as err:
             raise ConfigEntryAuthFailed(
                 "HelloFresh credentials are no longer valid"
@@ -75,4 +92,8 @@ class HelloFreshCoordinator(DataUpdateCoordinator[HelloFreshData]):
         except aiohttp.ClientError as err:
             raise UpdateFailed(f"Network error communicating with HelloFresh: {err}") from err
 
-        return HelloFreshData(current_week=current_week, next_delivery=next_delivery)
+        return HelloFreshData(
+            last_delivery=last_delivery,
+            next_delivery=next_delivery,
+            next_changeable=next_changeable,
+        )

@@ -18,24 +18,28 @@ hacs.json            # HACS metadata
 
 ## Sensors
 
-### `sensor.hellofresh_this_weeks_meals`
-- **State**: number of meals ordered this week
+### `sensor.hellofresh_last_delivery`
+- **State**: number of meals in the most recently delivered box
 - **Unit**: `meals`
 - **Attributes**: `week` (ISO week string), `meals` (list of `{name, headline, image_url, website_url, pdf_url, category}`)
 
 ### `sensor.hellofresh_next_delivery`
-- **State**: `SensorDeviceClass.TIMESTAMP`
-  - Before cutoff → shows the **cutoff datetime** (last time to change your order)
-  - After cutoff → shows the **delivery datetime**
-- **Attributes**: `week`, `status`, `cutoff_date`, `delivery_date`, `meals` (currently selected meals only)
+- **State**: `SensorDeviceClass.TIMESTAMP` — the **delivery datetime** of the next scheduled delivery
+- **Attributes**: `week`, `status`, `cutoff_date`, `delivery_date`, `meals`
+
+### `sensor.hellofresh_next_changeable_delivery`
+- **State**: `SensorDeviceClass.TIMESTAMP` — the **cutoff datetime** (deadline to change the order)
+- **Attributes**: `week`, `cutoff_date`, `delivery_date`, `meals` (currently selected meals)
+- Returns `None` when all upcoming deliveries are past their cutoff
 
 ## Coordinator data model
 
 ```python
 @dataclass
 class HelloFreshData:
-    current_week: WeeklyDelivery      # from get_current_week_meals()
-    next_delivery: UpcomingDelivery | None  # from get_upcoming_delivery()
+    last_delivery: WeeklyDelivery | None       # from get_last_delivery()
+    next_delivery: UpcomingDelivery | None     # from get_upcoming_delivery()
+    next_changeable: UpcomingDelivery | None   # from get_next_changeable_delivery() (or reuses next_delivery if cutoff not yet passed)
 ```
 
 ## Config entry data keys

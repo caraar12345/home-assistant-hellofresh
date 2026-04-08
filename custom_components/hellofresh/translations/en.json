@@ -34,11 +34,14 @@
   },
   "entity": {
     "sensor": {
-      "current_week_meals": {
-        "name": "This Week's Meals"
+      "last_delivery": {
+        "name": "Last Delivery"
       },
       "next_delivery": {
         "name": "Next Delivery"
+      },
+      "next_changeable_delivery": {
+        "name": "Next Changeable Delivery"
       }
     }
   }
